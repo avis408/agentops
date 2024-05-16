@@ -9,6 +9,7 @@ from .helpers import get_ISO_time, check_call_stack_for_agent_id
 import inspect
 from typing import Optional
 import pprint
+from async_context_manager import AsyncGeneratorContextManager
 
 original_create = None
 original_create_async = None
@@ -92,7 +93,7 @@ class LlmTracker:
                     handle_stream_chunk(chunk)
 
                     yield chunk
-            return async_generator()
+            return AsyncGeneratorContextManager(async_generator())
 
         elif inspect.isgenerator(response):
             def generator():
@@ -194,7 +195,7 @@ class LlmTracker:
                 async for chunk in response:
                     handle_stream_chunk(chunk)
                     yield chunk
-            return async_generator()
+            return AsyncGeneratorContextManager(async_generator())
 
         # For async AsyncCompletion
         elif isinstance(response, AsyncCompletions):
@@ -202,7 +203,7 @@ class LlmTracker:
                 async for chunk in response:
                     handle_stream_chunk(chunk)
                     yield chunk
-            return async_generator()
+            return AsyncGeneratorContextManager(async_generator())
 
         # v1.0.0+ responses are objects
         try:
@@ -295,7 +296,7 @@ class LlmTracker:
                 async for chunk in response:
                     handle_stream_chunk(chunk)
                     yield chunk
-            return async_generator()
+            return AsyncGeneratorContextManager(async_generator())
 
         elif inspect.isgenerator(response):
             def generator():
